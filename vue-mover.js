@@ -1,9 +1,78 @@
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, exports) {
+
 /*
      Vue-Mover Component
      -------------------
      by Rick Strahl, West Wind Technologies
 
-     Version 0.3.2
+     Version 0.3.3
      February 9th, 2018
      
      depends on: 
@@ -27,7 +96,7 @@
              :font-awesome="true"
              targetId="MyMover"
              @item-moved="onItemMoved"
-             >
+             @moved-all="onMovedAll">
        </mover>
 
     Vue code:
@@ -103,7 +172,10 @@ var vue = Vue.component("mover", {
         raiseItemMoved: function _raiseItemMoved(item, targetList, listType) { 
             this.lastMovedItem =  { item: item, targetList, listType };
             this.$emit('item-moved', this.lastMovedItem);
-        },    
+        },
+        raiseMovedAll: function _raiseMovedAll(direction) {
+            this.$emit('moved-all', direction)
+        }    
     },
     template: '<div :id="targetId" class="mover-container">' + '\n' +
     '    <div id="MoverLeft" class="mover-panel-box mover-left">' + '\n' +
@@ -277,6 +349,9 @@ var vue = Vue.component("mover", {
                     vm.unselectedItems.splice(i, 1);
                     vm.selectedItems.push(item);
                 }
+                setTimeout(function() {
+                    vue.raiseMovedAll("right");
+                })
             },
             moveAllLeft: function () {
                 for (var i = vm.selectedItems.length - 1; i >= 0; i--) {
@@ -284,6 +359,9 @@ var vue = Vue.component("mover", {
                     vm.selectedItems.splice(i, 1);
                     vm.unselectedItems.push(item);
                 }
+                setTimeout(function() {
+                    vue.raiseMovedAll("left");
+                })
             },
             refreshListDisplay: function () {
                 setTimeout(function () {
@@ -297,7 +375,6 @@ var vue = Vue.component("mover", {
                 }, 10);
             },
             onSorted: function (e) {
-
                 var key = e.item.dataset["id"];
                 var side = e.item.dataset["side"];
 
@@ -325,14 +402,17 @@ var vue = Vue.component("mover", {
                     if (side == "left") {
                         vm.unselectedItems = list;
                         vm.selectItem(item, vm.unselectedItems);
+                        vue.raiseItemMoved(item,vm.unselectedItems, "sort-left")
                     }
                     else {
                         vm.selectedItems = list;
                         vm.selectItem(item, vm.selectedItems);
+                        vue.raiseItemMoved(item,vm.selectedItems, "sort-right")
+
                     }
                 });
             },
-            onListDrop: function (e) {                
+            onListDrop: function (e) {
                 var key = e.item.dataset["id"];
                 var side = e.item.dataset["side"];
                 var insertAt = e.newIndex;
@@ -498,3 +578,7 @@ if (!Array.prototype.findIndex) {
         }
     });
 }
+
+
+/***/ })
+/******/ ]);
