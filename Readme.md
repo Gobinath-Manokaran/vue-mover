@@ -139,7 +139,7 @@ You can override the styling of the various styles in the `vue-mover.css` style 
 If you have multiple movers prefix your tags with the mover's target id to keep the CSS separate. The default ID is `Mover`.
 
 #### `item-moved` Event
-The component fires an ItemMoved event which is fired when an item is moved from left to right or right to left. The event is hooked up with:
+The component fires an ItemMoved event which is fired when an item is moved from left to right or right to left or sorted within either list. The event is hooked up with:
 
 ```
 @item-moved="itemMovedHandler"
@@ -151,7 +151,21 @@ which should be mapped to a method on your model:
 itemMovedHandler: function(itemMovedInfo) {
     var item = itemMovedInfo.item;          // the item that was moved
     var list = itemMovedInfo.targetList;    // list that was updated
-    var type = itemMovedInfo.listType       // "left", "right"
+    var type = itemMovedInfo.listType       // "left", "right", "sort-left", "sort-right"
+}
+```
+#### `moved-all` Event
+The component fires a MovedAll event which is fired when all of the items are moved to the right or to the left. The event is hooked up with:
+
+```
+@moved-all="movedAllHandler"
+```
+
+which should be mapped to a method on your model:
+
+```js
+movedAllHandler: function(direction) {
+    // direction will either be left or right.
 }
 ```
 
