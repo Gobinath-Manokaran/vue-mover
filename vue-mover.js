@@ -3,8 +3,8 @@
      -------------------
      by Rick Strahl, West Wind Technologies
 
-     Version 0.3.2
-     February 9th, 2018
+     Version 0.3.3
+     February 13th, 2018
      
      depends on: 
      -----------
@@ -27,6 +27,7 @@
              :font-awesome="true"
              targetId="MyMover"
              @item-moved="onItemMoved"
+             @moved-all="onMovedAll"
              >
        </mover>
 
@@ -103,7 +104,10 @@ var vue = Vue.component("mover", {
         raiseItemMoved: function _raiseItemMoved(item, targetList, listType) { 
             this.lastMovedItem =  { item: item, targetList, listType };
             this.$emit('item-moved', this.lastMovedItem);
-        },    
+        },
+        raiseMovedAll: function _raiseMovedAll(direction) {
+            this.$emit('moved-all', direction)
+        },  
     },
     template: '<div :id="targetId" class="mover-container">' + '\n' +
     '    <div id="MoverLeft" class="mover-panel-box mover-left">' + '\n' +
@@ -277,6 +281,9 @@ var vue = Vue.component("mover", {
                     vm.unselectedItems.splice(i, 1);
                     vm.selectedItems.push(item);
                 }
+                setTimeout(function() {
+                    vue.raiseMovedAll("right");
+                }) 
             },
             moveAllLeft: function () {
                 for (var i = vm.selectedItems.length - 1; i >= 0; i--) {
@@ -284,6 +291,9 @@ var vue = Vue.component("mover", {
                     vm.selectedItems.splice(i, 1);
                     vm.unselectedItems.push(item);
                 }
+                setTimeout(function() {
+                    vue.raiseMovedAll("left");
+                })
             },
             refreshListDisplay: function () {
                 setTimeout(function () {
@@ -325,10 +335,12 @@ var vue = Vue.component("mover", {
                     if (side == "left") {
                         vm.unselectedItems = list;
                         vm.selectItem(item, vm.unselectedItems);
+                        vue.raiseItemMoved(item,vm.unselectedItems, "sort-left");
                     }
                     else {
                         vm.selectedItems = list;
                         vm.selectItem(item, vm.selectedItems);
+                        vue.raiseItemMoved(item,vm.selectedItems, "sort-right"); 
                     }
                 });
             },
